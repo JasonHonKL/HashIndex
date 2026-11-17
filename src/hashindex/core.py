@@ -250,7 +250,11 @@ def _build_system_prompt(
     return prompt
 
 
-def index_pdf(file_path: str, verbose: bool = True) -> HashIndex:
+def index_pdf(
+    file_path: str,
+    verbose: bool = True,
+    model: Model | None = None,
+) -> HashIndex:
     """
     Index a PDF file using hash-based indexing.
 
@@ -271,7 +275,7 @@ def index_pdf(file_path: str, verbose: bool = True) -> HashIndex:
         print(f"Split into {len(pages)} pages")
 
     index = HashIndex()
-    model = Model()
+    model = model if model is not None else Model()
     existing_keys: set[str] = set()
 
     previous_hash_key: str | None = None
@@ -421,6 +425,7 @@ def query_index(
     question: str,
     max_iterations: int = 10,
     verbose: bool = True,
+    model: Model | None = None,
 ) -> str:
     """
     Query a hash index with a question.
@@ -442,7 +447,7 @@ def query_index(
     else:
         index = index_or_file
 
-    model = Model()
+    model = model if model is not None else Model()
     tools = [ListKeys(index), GetSummary(index), GetContent(index)]
 
     messages: list[Message] = [
@@ -530,3 +535,4 @@ def query_index(
         return final_msg.get("content", "No response generated.")
 
     return "Unable to generate a response."
+
